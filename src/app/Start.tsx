@@ -2,7 +2,7 @@
 // four steps from an untouched camera to a developed photo. The steps tick off as the app sees
 // them done. The pictures are one raw (B0000042) with its number plate blanked.
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode, type SyntheticEvent } from 'react'
 import { model, useModel, type Place } from './model'
 import { EdgePrint } from './ui/theme'
 
@@ -98,6 +98,7 @@ export function Start() {
                 <p>
                   Turn the camera on. Hazel starts a few seconds after live view does. Choose a recipe in the menu under General Settings, Hazel, and fine-tune it with the wheels. Tap the recipe name on the screen to switch, also on a photo you already took.
                 </p>
+                <OnTheCamera />
               </Step>
               <Step n={4} title="Develop your photos" done={state.photos.length > 0} doneText={`${state.photos.length} photo${state.photos.length === 1 ? '' : 's'} open`}>
                 <p>Open the card or a folder of raws in the Darkroom. Each photo opens with the look you shot it with. Change it, compare, and export. The raw file itself never changes.</p>
@@ -277,5 +278,180 @@ function Compare({ look }: { look: (typeof LOOKS)[number] }) {
       <span className="intro-tag right">{look.name}</span>
       <input id="intro-split" type="range" min="0" max="100" value={split} onChange={(e) => setSplit(Number(e.target.value))} aria-label={`Compare the photo as shot with ${look.name}`} />
     </div>
+  )
+}
+
+/** One of the camera's screens with numbered arrows: each points from its number at [tail] to the
+ *  thing at [tip], in the screen's own 640 x 480 pixels. */
+interface Screen {
+  title: string
+  file: string
+  alt: string
+  notes: { text: string; tail: [number, number]; tip: [number, number] }[]
+}
+
+const SCREENS: Screen[] = [
+  {
+    title: 'Find Hazel in the menu',
+    file: 'menu',
+    alt: "The camera's General Settings list: Wi-Fi, Display, Hazel, Touch",
+    notes: [{ text: 'Press Menu, tap the gear for General Settings, then Hazel.', tail: [430, 292], tip: [262, 292] }],
+  },
+  {
+    title: 'Switch it on',
+    file: 'switches',
+    alt: "Hazel's settings page: Film look, Recipe name and Temperature readout, all ticked",
+    notes: [
+      { text: 'Film look: the look in live view and on your photos. Untick it for the camera’s own picture.', tail: [490, 196], tip: [396, 196] },
+      { text: 'Recipe name: shows which recipe is in use, on screen while you shoot.', tail: [490, 291], tip: [396, 291] },
+      { text: 'Temperature readout: the image chip and sensor temperatures, at the top of live view.', tail: [490, 384], tip: [396, 384] },
+    ],
+  },
+  {
+    title: 'Pick a recipe',
+    file: 'slots',
+    alt: "Hazel's recipe slots: C2 Red filter black and white, C3 Warm portrait, C4 Silver screen, C5 Gold 200 ticked",
+    notes: [
+      { text: 'Your seven slots, C1 to C7: the recipes on the memory card.', tail: [490, 198], tip: [396, 198] },
+      { text: 'The tick is the recipe in use. Tap another slot to switch.', tail: [490, 384], tip: [396, 384] },
+    ],
+  },
+  {
+    title: 'Shoot with it',
+    file: 'live-view',
+    alt: 'Live view with the Gold 200 look, its name at the top right next to a sliders button',
+    notes: [
+      { text: 'The recipe in use. Tap its name to pick another one, also on a photo in playback.', tail: [560, 290], tip: [556, 168] },
+      { text: 'The sliders button: change this recipe right here on the camera.', tail: [290, 236], tip: [408, 160] },
+    ],
+  },
+  {
+    title: 'Switch without the menu',
+    file: 'picker',
+    alt: 'The list of recipes over live view, with Gold 200 highlighted',
+    notes: [{ text: 'Tapping the name opens your recipes. Scroll the list and tap the one you want.', tail: [575, 410], tip: [463, 300] }],
+  },
+  {
+    title: 'Change a recipe',
+    file: 'adjust-settings',
+    alt: 'The settings of the Gold 200 recipe on the Colour tab, next to the live picture',
+    notes: [
+      { text: 'Pick a setting. Tone, Colour and Texture each have their own list.', tail: [430, 175], tip: [300, 122] },
+      { text: 'Done: save it to its slot, save it as a new one, use it without saving, or throw the changes away.', tail: [430, 445], tip: [290, 445] },
+    ],
+  },
+  {
+    title: 'Turn the wheels',
+    file: 'adjust-wheels',
+    alt: 'Shadow tint over live view, with sliders for hue and amount',
+    notes: [
+      { text: 'The front wheel moves the first slider, here the hue.', tail: [290, 320], tip: [220, 388] },
+      { text: 'The rear wheel moves the second, here the amount.', tail: [440, 300], tip: [528, 428] },
+      { text: 'Hold your finger on the picture to see the saved recipe, for comparison.', tail: [330, 466], tip: [452, 466] },
+    ],
+  },
+  {
+    title: 'Name a new recipe',
+    file: 'adjust-name',
+    alt: 'A keyboard on the camera, with "Autumn teal" typed as the name of a recipe saved as new',
+    notes: [
+      { text: 'Saving as a new recipe asks for a name. It goes into a free slot and onto the card.', tail: [320, 112], tip: [196, 96] },
+      { text: 'Save when the name is right.', tail: [408, 464], tip: [462, 444] },
+    ],
+  },
+]
+
+/** Step 3's walk through the camera's own screens, open to start with and folded on request. */
+function OnTheCamera() {
+  const [at, setAt] = useState(0)
+  const [hover, setHover] = useState<number | null>(null)
+  const screen = SCREENS[at]
+  const move = (by: number) => {
+    setHover(null)
+    setAt((i) => (i + by + SCREENS.length) % SCREENS.length)
+  }
+  // all eight load while the section is open, so a screen and its arrows always change together
+  const preload = (event: SyntheticEvent<HTMLDetailsElement>) => {
+    if (event.currentTarget.open) for (const s of SCREENS) new Image().src = `/intro/camera-${s.file}.jpg`
+  }
+  return (
+    <details className="intro-onscreen" open onToggle={preload}>
+      <summary>
+        <span className="intro-onscreen-arrow" aria-hidden="true">
+          ▸
+        </span>
+        See it on the camera
+        <span className="subtle small">{SCREENS.length} screens</span>
+      </summary>
+      <div className="intro-onscreen-body">
+        <div className="intro-onscreen-head">
+          <EdgePrint tone="subtle">{`${at + 1} of ${SCREENS.length}`}</EdgePrint>
+          <h4>{screen.title}</h4>
+        </div>
+        <div className="intro-onscreen-grid">
+          <figure className="intro-onscreen-picture" key={screen.file}>
+            <img src={`/intro/camera-${screen.file}.jpg`} alt={screen.alt} width={640} height={480} />
+            <svg viewBox="0 0 640 480" aria-hidden="true">
+              {screen.notes.map((note, i) => (
+                <Callout key={i} n={i + 1} tail={note.tail} tip={note.tip} faded={hover !== null && hover !== i} />
+              ))}
+            </svg>
+          </figure>
+          <ol className="intro-onscreen-notes">
+            {screen.notes.map((note, i) => (
+              <li key={i} onPointerEnter={() => setHover(i)} onPointerLeave={() => setHover(null)}>
+                <span className="intro-onscreen-n" aria-hidden="true">
+                  {i + 1}
+                </span>
+                <span>{note.text}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <div className="row intro-onscreen-nav">
+          <button type="button" className="button" onClick={() => move(-1)} aria-label="Previous screen">
+            ←
+          </button>
+          <div className="intro-onscreen-dots">
+            {SCREENS.map((s, i) => (
+              <button key={s.file} type="button" aria-label={s.title} aria-current={i === at ? 'step' : undefined} onClick={() => (setHover(null), setAt(i))} />
+            ))}
+          </div>
+          <button type="button" className="button" onClick={() => move(1)} aria-label="Next screen">
+            →
+          </button>
+        </div>
+      </div>
+    </details>
+  )
+}
+
+function Callout({ n, tail, tip, faded }: { n: number; tail: [number, number]; tip: [number, number]; faded: boolean }) {
+  const [x1, y1] = tail
+  const [x2, y2] = tip
+  const angle = Math.atan2(y2 - y1, x2 - x1)
+  const length = Math.hypot(x2 - x1, y2 - y1)
+  // the line starts at the number's edge and stops short of the tip, where the head takes over
+  const from = [x1 + Math.cos(angle) * 17, y1 + Math.sin(angle) * 17]
+  const to = [x2 - Math.cos(angle) * 10, y2 - Math.sin(angle) * 10]
+  const head = [0, -9, 9].map((spread) => {
+    const a = angle + Math.PI + (spread * Math.PI) / 60
+    const r = spread === 0 ? 0 : 18
+    return `${x2 + Math.cos(a) * r},${y2 + Math.sin(a) * r}`
+  })
+  return (
+    <g className={`intro-callout${faded ? ' faded' : ''}`}>
+      {length > 30 && (
+        <>
+          <line className="under" x1={from[0]} y1={from[1]} x2={to[0]} y2={to[1]} />
+          <line x1={from[0]} y1={from[1]} x2={to[0]} y2={to[1]} />
+        </>
+      )}
+      <polygon className="head" points={head.join(' ')} />
+      <circle cx={x1} cy={y1} r={15} />
+      <text x={x1} y={y1}>
+        {n}
+      </text>
+    </g>
   )
 }
