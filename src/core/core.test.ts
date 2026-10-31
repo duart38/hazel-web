@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { lookEngineFromModule } from '../look/engine'
-import { readCardSlots, writeCardSlots, CARD_README, photoFolders, isCard } from './card'
+import { readCardSlots, writeCardSlots, CARD_README, photoFolders, isCard, sameSlotRecipe } from './card'
 import { isCollectionFile, mergedIncluded, RecipeCollection, sha256Hex } from './collection'
 import { MemoryFolder } from './folder'
 import { daysLeft, formatSlots, INCLUDED, libraryFileName, parseSlots, RecipeLibrary, STARTER_NAMES } from './library'
@@ -358,5 +358,19 @@ describe('swatches and zips', () => {
     const view = new DataView(await blob.arrayBuffer())
     expect(view.getUint32(0, true)).toBe(0x04034b50)
     expect(view.getUint32(blob.size - 22, true)).toBe(0x06054b50)
+  })
+})
+
+describe('slots on the card', () => {
+  const older = '# Gritty black and white\nmono = 1\ncontrast = 0.4\nshadows = -0.2\nclarity = 0.8\ngrain = 0.5\ngrain_size = 0.6\nvignette = 0.3\n'
+  const app = '# Gritty black and white\n# Hard black and white with coarse grain and strong local contrast.\nmono = 1\ncontrast = 0.400\nshadows = -0.200\nclarity = 0.800\ngrain = 0.500\ngrain_size = 0.600\nvignette = 0.300\n'
+
+  it('counts a recipe written the older way as the same', () => {
+    expect(sameSlotRecipe(look, app, older)).toBe(true)
+  })
+
+  it('tells a changed setting or name apart', () => {
+    expect(sameSlotRecipe(look, app, older.replace('grain = 0.5', 'grain = 0.6'))).toBe(false)
+    expect(sameSlotRecipe(look, app, older.replace('# Gritty', '# Grainy'))).toBe(false)
   })
 })

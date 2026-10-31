@@ -1,5 +1,6 @@
 // Putting Hazel on the camera, its seven recipe slots, and getting them onto its card.
 
+import { sameSlotRecipe } from '../core/card'
 import { SLOT_NAMES, storedText, type SlotName } from '../core/library'
 import { canPickFolders, pickFiles } from './folders'
 import { InstallHazel } from './InstallHazel'
@@ -123,18 +124,17 @@ function SlotCard({ slot }: { slot: SlotName }) {
         <span className="badge slot-badge" id={`${id}-label`}>
           {slot}
         </span>
-        {state.cardSlots !== null &&
-          (wanted === onCard ? (
-            wanted !== undefined && (
-              <span className="slot-state">
-                <EdgePrint tone="subtle">on card</EdgePrint>
-              </span>
-            )
-          ) : (
-            <span className="slot-state">
+        {state.cardSlots !== null && (wanted !== undefined || onCard !== undefined) && (
+          <span className="slot-state">
+            {onCard === undefined ? (
               <EdgePrint tone="safelight">not on card yet</EdgePrint>
-            </span>
-          ))}
+            ) : wanted !== undefined && sameSlotRecipe(model.engines.look, wanted, onCard) ? (
+              <EdgePrint tone="subtle">on card</EdgePrint>
+            ) : (
+              <EdgePrint tone="safelight">different on card</EdgePrint>
+            )}
+          </span>
+        )}
       </div>
       <div className="row tight">
         <SelectBox className="grow" label={`Recipe in ${slot}`} value={stored ? stored.name : ''} shown={stored ? stored.name : 'Empty'} onChange={(v) => void model.setSlot(slot, v || null)}>

@@ -2,8 +2,11 @@
 // `DCIM`: formatting the card in the camera removes them, and that is on purpose (README,
 // "Starting from the card").
 
+import type { LookEngine } from '../engine/types'
+import { sameRecipe } from '../look/recipe'
 import { readText, type Folder } from './folder'
 import { SLOT_NAMES, type SlotName } from './library'
+import { recipeSummary } from './recipe'
 
 export const CARD_FOLDER = 'HAZEL'
 
@@ -45,6 +48,14 @@ export async function readCardSlots(card: Folder): Promise<Partial<Record<SlotNa
     if (text !== null) slots[slot] = text
   }
   return slots
+}
+
+/** The card's slot file holds the recipe the app would write there: the same name and the same
+ *  look as the camera builds it, however the text is laid out or described (older versions wrote
+ *  numbers and lines differently, and left out the description). */
+export function sameSlotRecipe(look: Pick<LookEngine, 'parse'>, wanted: string, onCard: string): boolean {
+  if (wanted === onCard) return true
+  return recipeSummary(wanted) === recipeSummary(onCard) && sameRecipe(look.parse(wanted), look.parse(onCard))
 }
 
 /** Writes the slots: `HAZEL/recipes/C1.txt` … `C7.txt` and `HAZEL/README.txt`. A slot left
