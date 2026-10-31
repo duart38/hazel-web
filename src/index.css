@@ -928,6 +928,67 @@ select {
   font-size: 1.2rem;
 }
 
+/* Installing Hazel on the camera */
+.install {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.install-steps {
+  margin: 0;
+  padding-left: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.install-checks {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.install-checks li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.install-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  font-family: var(--mono);
+  color: var(--subtle);
+}
+.install-checks .is-ok .install-mark {
+  color: var(--amber);
+}
+.install-checks .is-bad {
+  color: var(--safelight);
+}
+.install-checks .is-bad .install-mark {
+  color: var(--safelight);
+}
+.small-spinner {
+  width: 14px;
+  height: 14px;
+}
+.install-done {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+.install-error {
+  color: var(--safelight);
+}
+
 /* Studio */
 .studio {
   display: grid;

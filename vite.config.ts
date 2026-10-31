@@ -96,8 +96,36 @@ function isolate(): Plugin {
   }
 }
 
+/** `HAZEL_DEV_FIRMWARE=../Hazel-firmware pnpm dev` has the camera installer take Hazel's camera
+ *  files from that checkout instead of GitHub, to try a setup before it's published. */
+function devFirmware(): Plugin {
+  const root = process.env.HAZEL_DEV_FIRMWARE
+  const files = ['release/hazel.tar', 'camera/boot.sh', 'camera/x1d-card-loader.service', 'camera/unb64']
+  return {
+    name: 'hazel-dev-firmware',
+    apply: 'serve',
+    config: () => (root ? { define: { 'import.meta.env.VITE_HAZEL_FIRMWARE': JSON.stringify('/__hazel/firmware') } } : {}),
+    configureServer(server) {
+      if (!root) return
+      server.middlewares.use('/__hazel/firmware', (req: IncomingMessage, res: ServerResponse) => {
+        const wanted = new URL(req.url ?? '/', 'http://dev').pathname.slice(1)
+        if (!files.includes(wanted)) {
+          res.statusCode = 404
+          return res.end()
+        }
+        createReadStream(path.resolve(root, wanted))
+          .on('error', () => {
+            res.statusCode = 404
+            res.end()
+          })
+          .pipe(res)
+      })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [isolate(), react(), devCard()],
+  plugins: [isolate(), react(), devCard(), devFirmware()],
   server: { headers: isolation },
   preview: { headers: isolation },
 })

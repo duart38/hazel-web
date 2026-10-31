@@ -1,7 +1,8 @@
-// The camera's seven recipe slots, and getting them onto its card.
+// Putting Hazel on the camera, its seven recipe slots, and getting them onto its card.
 
 import { SLOT_NAMES, storedText, type SlotName } from '../core/library'
 import { canPickFolders, pickFiles } from './folders'
+import { InstallHazel } from './InstallHazel'
 import { model, useModel } from './model'
 import { SamplePicker } from './SamplePicker'
 import { SelectBox } from './ui/controls'
@@ -20,6 +21,8 @@ export function Camera() {
       </header>
       <div className="scroll">
         <div className="page">
+          <InstallHazel />
+
           <section className="group" aria-labelledby="slots-title">
             <h2 id="slots-title">
               <EdgePrint>Slots</EdgePrint>
