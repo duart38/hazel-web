@@ -64,7 +64,7 @@ function OnCard() {
         </button>
       </div>
       <p className="subtle">
-        C1 to C7 are the recipes on this card, the ones the camera offers under Settings, Extras. Choose one of your recipes for a slot and it goes onto the card straight away. Recipes saved or
+        C1 to C7 are the recipes on this card, the ones the camera offers under General Settings, Hazel. Choose one of your recipes for a slot and it goes onto the card straight away. Recipes saved or
         changed on the camera show up here too.
       </p>
       {cardOnly.length > 0 && (

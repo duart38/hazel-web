@@ -128,7 +128,7 @@ export function InstallHazel() {
               {phase.action === 'install' ? (
                 <>
                   <strong>Hazel is on the camera.</strong>
-                  <p>Turn the camera off and on again. Hazel starts a few seconds after live view does. Choose a recipe under Settings, Extras, and pick the recipes for C1 to C7 below.</p>
+                  <p>Turn the camera off and on again. Hazel starts a few seconds after live view does. Choose a recipe under General Settings, Hazel, and pick the recipes for C1 to C7 below.</p>
                 </>
               ) : (
                 <>

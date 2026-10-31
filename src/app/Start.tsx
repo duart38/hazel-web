@@ -96,7 +96,7 @@ export function Start() {
               </Step>
               <Step n={3} title="Shoot with a look">
                 <p>
-                  Turn the camera on. Hazel starts a few seconds after live view does. Choose a recipe under Settings, Extras, and fine-tune it with the wheels. Tap the recipe name on the screen to switch, also on a photo you already took.
+                  Turn the camera on. Hazel starts a few seconds after live view does. Choose a recipe in the menu under General Settings, Hazel, and fine-tune it with the wheels. Tap the recipe name on the screen to switch, also on a photo you already took.
                 </p>
               </Step>
               <Step n={4} title="Develop your photos" done={state.photos.length > 0} doneText={`${state.photos.length} photo${state.photos.length === 1 ? '' : 's'} open`}>

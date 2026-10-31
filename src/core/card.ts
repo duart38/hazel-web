@@ -12,7 +12,7 @@ export const CARD_FOLDER = 'HAZEL'
 
 export const CARD_README = `Hazel: film looks for the Hasselblad X1D (a personal project, not made by or
 affiliated with Hasselblad).
-recipes/C1.txt ... C7.txt are the recipes the camera's Extras page offers.
+recipes/C1.txt ... C7.txt are the recipes the camera's Hazel settings page offers.
 Written by the Hazel app. Delete this folder, or format the card in the camera,
 to remove everything; the camera itself is not changed by these files.
 `
