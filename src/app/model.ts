@@ -30,8 +30,9 @@ import type { Engines } from './engines'
 import { devCard, download, FileListFolder, HandleFolder, pickFolder, readFileHandle, reopen } from './folders'
 import { FULL_SIZE, Renderer, type PhotoRef } from './render'
 
-export type Place = 'darkroom' | 'recipes' | 'studio' | 'camera'
+export type Place = 'start' | 'darkroom' | 'recipes' | 'studio' | 'camera'
 export const PLACES: { id: Place; name: string }[] = [
+  { id: 'start', name: 'Start' },
   { id: 'darkroom', name: 'Darkroom' },
   { id: 'recipes', name: 'Recipes' },
   { id: 'studio', name: 'Studio' },
@@ -94,7 +95,7 @@ export interface State {
 
 const initial: State = {
   loaded: false,
-  place: 'darkroom',
+  place: 'start',
   recipes: [],
   included: INCLUDED,
   deleted: [],
@@ -192,7 +193,8 @@ export class AppModel {
     this.set({
       exportFormat: EXPORT_FORMATS.some((f) => f.id === preferences.exportFormat) ? (preferences.exportFormat as ExportFormat) : 'jpeg',
       sampleName: preferences.sampleName ?? null,
-      place: preferences.place ?? 'darkroom',
+      // a first visit opens on Start; after that, wherever you left off
+      place: preferences.place ?? 'start',
     })
     await this.reloadRecipes()
     const unsaved = await this.store.get<UnsavedEdit>('unsaved')

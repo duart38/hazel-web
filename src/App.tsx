@@ -4,10 +4,11 @@ import { Darkroom } from './app/Darkroom'
 import { loadEngines } from './app/engines'
 import { model, PLACES, useModel, type Place } from './app/model'
 import { Recipes } from './app/Recipes'
+import { Start } from './app/Start'
 import { Studio } from './app/Studio'
 import { Spinner } from './app/ui/theme'
 
-const ICONS: Record<Place, string> = { darkroom: '▤', recipes: '▦', studio: '◐', camera: '◉' }
+const ICONS: Record<Place, string> = { start: '◇', darkroom: '▤', recipes: '▦', studio: '◐', camera: '◉' }
 
 export default function App() {
   const state = useModel()
@@ -31,7 +32,7 @@ export default function App() {
     return () => window.removeEventListener('beforeunload', warn)
   }, [])
 
-  // Alt+1..4 switch tabs (Ctrl/⌘ and the digits belong to zoom)
+  // Alt+1..5 switch tabs (Ctrl/⌘ and the digits belong to zoom)
   useEffect(() => {
     const keys = (event: KeyboardEvent) => {
       if (!event.altKey || event.metaKey || event.ctrlKey) return
@@ -86,6 +87,9 @@ export default function App() {
       </nav>
       {/* every tab stays alive, as in the Mac app: the Studio keeps its undo history */}
       <main className="content">
+        <div className="place" hidden={state.place !== 'start'}>
+          <Start />
+        </div>
         <div className="place" hidden={state.place !== 'darkroom'}>
           <Darkroom />
         </div>

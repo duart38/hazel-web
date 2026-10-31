@@ -2109,3 +2109,458 @@ select {
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   }
 }
+
+/* Start: what Hazel is and the four steps to a developed photo. The website's centred hero over
+   the camera's back drawn in faded lines, only its screens lit with the look, then the steps as a
+   numbered path that ticks off as the app sees them done. */
+.intro-page {
+  display: flex;
+  flex-direction: column;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0 24px 40px;
+}
+.intro-hero {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding-block: clamp(40px, 8vw, 84px) 0;
+  text-align: center;
+}
+.intro-hero h1 {
+  font-size: clamp(2.4rem, 6.5vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  font-weight: 650;
+  text-wrap: balance;
+}
+.intro-hero h1 em {
+  font-style: normal;
+  color: var(--amber);
+}
+.intro-sub {
+  max-width: 34rem;
+  font-size: clamp(1rem, 1.8vw, 1.15rem);
+  line-height: 1.5;
+  color: var(--subtle);
+}
+.intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 6px;
+}
+.button.intro-big {
+  min-height: 44px;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 1rem;
+}
+
+.intro-camera {
+  position: relative;
+  width: 100%;
+  max-width: 820px;
+  margin: clamp(36px, 6vw, 56px) auto 0;
+  aspect-ratio: 1200 / 790;
+}
+.intro-camera svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.intro-camera svg * {
+  fill: none;
+  stroke: var(--text);
+  stroke-opacity: 0.28;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.intro-camera svg .grip line {
+  stroke-opacity: 0.12;
+}
+.intro-camera svg .glass {
+  fill: #ede8de08;
+}
+.intro-camera svg .cup {
+  fill: var(--background);
+}
+.intro-camera svg .sensor {
+  stroke: var(--amber);
+  stroke-opacity: 0.7;
+}
+.intro-screen,
+.intro-evf {
+  position: absolute;
+  overflow: hidden;
+  background: #000;
+}
+.intro-screen {
+  left: 10.667%;
+  top: 35.95%;
+  width: 44.667%;
+  height: 51.14%;
+  border-radius: 4px;
+  box-shadow: 0 0 80px -10px #f2a33a59;
+}
+.intro-evf {
+  left: 29.333%;
+  top: 11.646%;
+  width: 10.833%;
+  height: 13.165%;
+  border-radius: 3px;
+  visibility: hidden;
+}
+.intro-screen img,
+.intro-evf img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 70% 50%;
+}
+.intro-eye-sensor {
+  position: absolute;
+  left: 42.5%;
+  top: 12.5%;
+  width: 6%;
+  height: 12%;
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: transparent;
+  cursor: pointer;
+}
+.intro-camera.eye .intro-evf {
+  visibility: visible;
+  box-shadow: 0 0 40px -6px #f2a33a73;
+}
+.intro-camera.eye .intro-screen {
+  box-shadow: none;
+}
+.intro-camera.eye .intro-screen img {
+  visibility: hidden;
+}
+
+.intro-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+.intro-chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--subtle);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+.intro-chips button b {
+  font: 600 0.7rem/1 var(--mono);
+  color: var(--amber);
+}
+.intro-chips button:hover {
+  color: var(--text);
+}
+.intro-chips button[aria-pressed='true'] {
+  color: var(--text);
+  border-color: var(--amber);
+}
+.intro-caption {
+  margin-top: 12px;
+  text-align: center;
+  font-size: 0.88rem;
+  color: var(--subtle);
+}
+
+.intro-section {
+  display: flex;
+  flex-direction: column;
+  padding-top: clamp(56px, 9vw, 96px);
+}
+.intro-section h2 {
+  font-size: clamp(1.7rem, 3.6vw, 2.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 650;
+  text-wrap: balance;
+}
+.intro-lead {
+  margin: 8px 0 28px;
+  font-size: 1.05rem;
+  color: var(--subtle);
+}
+
+/* the path: a numbered dot per step on one line down the left, amber once done */
+.intro-steps {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.intro-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 18px;
+  padding-bottom: 30px;
+}
+.intro-step::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 40px;
+  bottom: 0;
+  width: 2px;
+  background: var(--line);
+}
+.intro-step:last-child {
+  padding-bottom: 0;
+}
+.intro-step:last-child::before {
+  display: none;
+}
+.intro-step-mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--panel);
+  font: 600 0.95rem/1 var(--mono);
+  color: var(--text);
+}
+.intro-step.is-done .intro-step-mark {
+  border-color: var(--amber);
+  background: var(--amber);
+  color: #1a1206;
+}
+.intro-step.is-done::before {
+  background: var(--amber-dim);
+}
+.intro-step-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 40rem;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+}
+.intro-step-body h3 {
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+}
+.intro-step-body p {
+  line-height: 1.55;
+  color: #ede8ded9;
+}
+.intro-step-body a,
+.intro-warning a {
+  color: var(--text);
+  border-bottom: 1px solid var(--amber);
+  text-decoration: none;
+}
+.intro-needs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.intro-needs li {
+  padding: 4px 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--raised);
+  font-size: 0.8rem;
+  color: var(--subtle);
+}
+.intro-warning {
+  padding: 10px 12px;
+  border-left: 3px solid var(--safelight);
+  border-radius: 4px;
+  background: #e5543d1a;
+}
+
+.intro-compare {
+  --split: 50%;
+  position: relative;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel);
+  box-shadow: 0 30px 90px -30px #000e;
+}
+.intro-shot {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.intro-after {
+  clip-path: inset(0 0 0 var(--split));
+}
+.intro-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--split);
+  width: 2px;
+  margin-left: -1px;
+  background: var(--text);
+  pointer-events: none;
+}
+.intro-handle::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 4px 16px #0006;
+}
+.intro-compare input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+.intro-compare:has(input:focus-visible) {
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}
+.intro-tag {
+  position: absolute;
+  bottom: 14px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #12110fa6;
+  backdrop-filter: blur(8px);
+  font: 600 0.7rem/1.2 var(--mono);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.intro-tag.left {
+  left: 14px;
+}
+.intro-tag.right {
+  right: 14px;
+  color: var(--amber);
+}
+
+.intro-points {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+  margin: clamp(56px, 9vw, 96px) 0 0;
+  padding: 26px 0 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+.intro-points h3 {
+  margin-bottom: 6px;
+  font-size: 1rem;
+}
+.intro-points p {
+  line-height: 1.5;
+  color: var(--subtle);
+}
+
+.intro-why {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 16px 40px;
+  align-items: start;
+}
+.intro-story {
+  display: grid;
+  gap: 16px;
+  max-width: 38rem;
+  font-size: 1.08rem;
+  line-height: 1.65;
+  color: #ede8ded9;
+}
+
+.intro-footer {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px 28px;
+  margin-top: clamp(56px, 9vw, 96px);
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  color: var(--subtle);
+}
+.intro-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+.intro-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+.intro-footer a:hover {
+  color: var(--text);
+}
+
+@media (max-width: 760px) {
+  .intro-page {
+    padding-inline: 16px;
+  }
+  .intro-points {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+  }
+  .intro-why {
+    grid-template-columns: 1fr;
+  }
+  .intro-step {
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: 12px;
+  }
+  .intro-step-mark {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+  .intro-step::before {
+    left: 15px;
+    top: 32px;
+  }
+  .intro-step-body {
+    padding: 14px 15px;
+  }
+}
+@media (max-width: 420px) {
+  .intro-points {
+    grid-template-columns: 1fr;
+  }
+}
