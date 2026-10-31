@@ -927,6 +927,11 @@ select {
   color: var(--amber);
   font-size: 1.2rem;
 }
+.card-note {
+  padding: 10px 14px;
+  border: 1px solid var(--amber-dim);
+  border-radius: var(--radius);
+}
 
 /* Installing Hazel on the camera */
 .install {

@@ -324,7 +324,7 @@ export function Studio() {
                   Save
                 </button>
               </div>
-              {slot && <EdgePrint>In camera slot {slot}</EdgePrint>}
+              {slot && <EdgePrint>In {slot} on the card</EdgePrint>}
               {draft.notes.length > 0 && <p className="subtle notes">{draft.notes.join('\n')}</p>}
 
               <Section title="Film">

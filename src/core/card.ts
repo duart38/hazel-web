@@ -58,6 +58,17 @@ export function sameSlotRecipe(look: Pick<LookEngine, 'parse'>, wanted: string, 
   return recipeSummary(wanted) === recipeSummary(onCard) && sameRecipe(look.parse(wanted), look.parse(onCard))
 }
 
+/** Writes one slot's recipe to the card, or removes it when `text` is undefined. */
+export async function writeCardSlot(card: Folder, slot: SlotName, text: string | undefined): Promise<void> {
+  const folder = await recipesFolder(card, true)
+  const hazel = await card.folder(CARD_FOLDER, true)
+  if (!folder || !hazel) throw new Error(`couldn't make ${CARD_FOLDER}/recipes on the card`)
+  const name = `${slot}.txt`
+  if (text !== undefined) await folder.writeFile(name, text)
+  else if ((await folder.list()).some((e) => e.name === name)) await folder.remove(name)
+  await hazel.writeFile('README.txt', CARD_README)
+}
+
 /** Writes the slots: `HAZEL/recipes/C1.txt` … `C7.txt` and `HAZEL/README.txt`. A slot left
  *  empty is removed. The camera reads up to 2 KB of recipe and copies it into each photo's 1 KB
  *  sidecar; app recipes are a few hundred bytes. */

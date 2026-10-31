@@ -4,7 +4,7 @@
 
 import { useSyncExternalStore } from 'react'
 import type { LookSettings } from '../engine/types'
-import { isCard, photoFolders, readCardSlots, writeCardSlots } from '../core/card'
+import { isCard, photoFolders, readCardSlots, sameSlotRecipe, writeCardSlot, writeCardSlots } from '../core/card'
 import { mergedIncluded, RecipeCollection } from '../core/collection'
 import { MemoryFolder, type Folder } from '../core/folder'
 import {
@@ -260,8 +260,51 @@ export class AppModel {
     return name
   }
 
+  /** The card slot holding a recipe of this name. Slots are what's on the card, so with no card
+   *  open, no recipe is in one. */
   slotOf(name: string): SlotName | undefined {
-    return SLOT_NAMES.find((slot) => this.state.slots[slot] === name)
+    const onCard = this.state.cardSlots
+    if (!onCard) return undefined
+    return SLOT_NAMES.find((slot) => {
+      const text = onCard[slot]
+      return text !== undefined && recipeSummary(text) === name
+    })
+  }
+
+  /** How the recipe in a card slot relates to yours: one of yours, one of yours changed on the
+   *  camera, or one only the card has. */
+  slotStatus(slot: SlotName): 'empty' | 'mine' | 'changed' | 'card only' {
+    const text = this.state.cardSlots?.[slot]
+    if (text === undefined) return 'empty'
+    const mine = this.recipeNamed(recipeSummary(text) ?? '')
+    if (!mine) return 'card only'
+    return sameSlotRecipe(this.engines.look, storedText(mine), text) ? 'mine' : 'changed'
+  }
+
+  /** The card slot's recipe into your recipes: as a new one, over yours of the same name, or as a
+   *  copy next to it. */
+  async keepFromCard(slot: SlotName, how: 'add' | 'replace' | 'copy'): Promise<StoredRecipe | null> {
+    const text = this.state.cardSlots?.[slot]
+    if (text === undefined) return null
+    const name = recipeSummary(text) ?? `${slot} from the card`
+    const mine = this.recipeNamed(name)
+    const stored =
+      how === 'replace' && mine ? await this.save(name, this.readSettings(text), mine) : await this.save(this.freeName(name), this.readSettings(text))
+    if (stored) this.notify(how === 'replace' ? `${stored.name} is now the camera's version` : `${stored.name} is in your recipes`)
+    return stored
+  }
+
+  /** Every recipe on the card that you don't have yet, into your recipes. */
+  async keepAllFromCard() {
+    const added: string[] = []
+    for (const slot of SLOT_NAMES) {
+      if (this.slotStatus(slot) !== 'card only') continue
+      const text = this.state.cardSlots?.[slot]
+      if (text === undefined) continue
+      const stored = await this.save(this.freeName(recipeSummary(text) ?? `${slot} from the card`), this.readSettings(text))
+      if (stored) added.push(stored.name)
+    }
+    if (added.length > 0) this.notify(`Added ${added.length === 1 ? added[0] : plural(added.length, 'recipe')} from the card`)
   }
 
   edit(recipe: StoredRecipe) {
@@ -366,7 +409,21 @@ export class AppModel {
     return this.save(this.freeName(included.name), this.readSettings(included.text))
   }
 
+  /** Puts one of your recipes in a slot, or empties it. On a card this browser can write to, that
+   *  happens on the card right away; otherwise it's planned for "Download for the card". */
   async setSlot(slot: SlotName, name: string | null) {
+    const card = this.state.card
+    if (card?.writable) {
+      const stored = name ? this.recipeNamed(name) : undefined
+      try {
+        await writeCardSlot(card, slot, stored ? storedText(stored) : undefined)
+        await this.refreshCardSlots()
+        this.notify(stored ? `${slot} on ${card.name} is now ${stored.name}` : `${slot} on ${card.name} is empty`)
+      } catch (error) {
+        this.fail(`Couldn't write to ${card.name}`, error)
+      }
+      return
+    }
     const slots: Slots = { ...this.state.slots }
     if (name) slots[slot] = name
     else delete slots[slot]
